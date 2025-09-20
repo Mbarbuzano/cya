@@ -18,15 +18,21 @@
 class Chain {
  public:
   Chain() { }
-  Chain(const std::vector<Symbol>& symbols) : simbolos_{symbols} { }
+  Chain(const std::vector<Symbol>& chain) : cadena_{chain} { }
+
+  std::vector<Symbol> cadena() const {
+    return cadena_;
+  }
 
   int length() const {
-    return simbolos_.size();
+    return cadena().size();
   }
 
 
  private:
-  std::vector<Symbol> simbolos_;
+  std::vector<Symbol> cadena_;
 };
+
+std::ostream& operator<<(std::ostream& os, const Chain& chain);
 
 #endif
