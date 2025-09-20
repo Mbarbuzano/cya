@@ -15,6 +15,8 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <set>
 
 class Symbol {
  public:
@@ -30,5 +32,8 @@ class Symbol {
  private:
   char simbolo_;
 };
+
+std::istream& operator>>(std::istream& in, Symbol& symbol);
+std::ostream& operator<<(std::ostream& os, const Symbol& symbol);
 
 #endif

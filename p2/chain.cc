@@ -7,5 +7,5 @@
 // Autor: Marcos Barbuzano Socorro
 // Correo: alu0101629469@ull.edu.es
 // Fecha: 25/09/2025
-// Archivo: string.cc
+// Archivo: chain.cc
 // Contenido: implementación de la clase cadena

@@ -16,4 +16,21 @@ void Symbol::operator=(const char& symbol) {
   simbolo_ = symbol;
 }
 
-bool Symbol::operator<(const )
+bool Symbol::operator<(const Symbol& other) const {
+  return (simbolo() < other.simbolo());
+}
+
+bool Symbol::operator==(const Symbol& symbol) {
+  return (simbolo() == symbol.simbolo());
+}
+
+std::istream& operator>>(std::istream& is, Symbol& symbol) {
+  char simbolin = symbol.simbolo();
+  is >> simbolin;
+  return is;
+}
+
+std::ostream& operator<<(std::ostream& os, const Symbol& symbol) {
+  os << symbol.simbolo();
+  return os;
+}

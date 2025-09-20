@@ -9,3 +9,10 @@
 // Fecha: 25/09/2025
 // Archivo: alphabet.h
 // Contenido: declaración de la clase alfabeto
+
+#ifndef ALPHABET_H_
+#define ALPHABET_H_
+
+#include "chain.h"
+
+#endif
