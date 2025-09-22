@@ -14,6 +14,7 @@
 #define SYMBOL_H_
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
 #include <set>

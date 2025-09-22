@@ -13,9 +13,9 @@
 #include "chain.h"
 
 std::ostream& operator<<(std::ostream& os, const Chain& chain) {
-  if (chain.length() == 0) os << "&";
+  if (chain.longitud() == 0) os << "&";
   else {
-    for (size_t i{0}; i < chain.length(); ++i) {
+    for (size_t i{0}; i < chain.longitud(); ++i) {
       os << chain.cadena()[i];
     }
   }

@@ -15,4 +15,19 @@
 
 #include "chain.h"
 
+class Alphabet {
+ public:
+  Alphabet() { }
+  Alphabet(std::set<Symbol> symbols) : simbolos_{symbols} { }
+
+  std::set<Symbol> simbolos() const {
+    return simbolos_;
+  }
+
+ private:
+  std::set<Symbol> simbolos_;
+};
+
+std::ostream& operator<<(std::ostream& os, const Alphabet& alfabeto);
+
 #endif

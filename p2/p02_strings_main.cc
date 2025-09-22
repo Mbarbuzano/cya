@@ -22,8 +22,8 @@ void Info() {
             << "Especifique los ficheros de entrada y salida para que funcione correctamente.\n";
 }
 
-int main(int argc, char **argv[]) {
-  if (argc > 1 && std::string(argv[4]) == "--help") {
+int main(int argc, char* argv[]) {
+  if (argc > 1 && std::string(argv[1]) == "--help") {
     Info();
     return 0;
   }
@@ -33,4 +33,28 @@ int main(int argc, char **argv[]) {
   }
 
   std::string filein{argv[1]};
+  std::string fileout{argv[2]};
+  int opcode = std::stoi(argv[3]);
+  std::ifstream infile(filein);
+  std::ofstream outfile(fileout);
+
+  if (!infile.is_open()) {
+    std::cerr << "El fichero no está abierto; no se tiene acceso.\n";
+    return 1;
+  }
+
+   if (!outfile.is_open()) {
+    std::cerr << "ERROR: no se pudo abrir el fichero de salida.\n";
+    return 1;
+  }
+
+  std::string cadena, alfabeto;
+  std::set<Symbol> simbolos;
+  while (infile >> cadena >> alfabeto) {
+    simbolos.clear();
+    for (char c : alfabeto) {
+      simbolos.insert(c);
+    }
+
+  }
 }

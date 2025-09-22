@@ -24,7 +24,7 @@ class Chain {
     return cadena_;
   }
 
-  int length() const {
+  int longitud() const {
     return cadena().size();
   }
 
