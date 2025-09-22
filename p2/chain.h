@@ -28,11 +28,15 @@ class Chain {
     return cadena().size();
   }
 
+  std::vector<Symbol> inversa();
+  std::set<Chain> prefijos() const;
+  std::set<Chain> sufijos() const;
 
  private:
   std::vector<Symbol> cadena_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Chain& chain);
+std::ostream& operator<<(std::ostream& os, const std::set<Chain>& cadenas);
 
 #endif
