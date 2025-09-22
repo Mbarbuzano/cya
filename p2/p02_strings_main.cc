@@ -55,6 +55,7 @@ int main(int argc, char* argv[]) {
     for (char c : alfabeto) {
       simbolos.insert(c);
     }
+    Chain chain{simbolos};
 
   }
 }
