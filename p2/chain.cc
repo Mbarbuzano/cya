@@ -12,12 +12,12 @@
 
 #include "chain.h"
 
-std::vector<Symbol> Chain::inversa() {
+Chain Chain::inversa() const {
   std::vector<Symbol> result;
-  for (int i{cadena().size() - 1}; i >= 0; --i) {
-    result.push_back(cadena()[i]);
+  for (auto it = cadena().rbegin(); it != cadena().rend(); ++it) {
+    result.push_back(*it);
   }
-  return result;
+  return Chain{result};
 }
 
 std::set<Chain> Chain::prefijos() const {
@@ -48,16 +48,31 @@ std::set<Chain> Chain::sufijos() const {
   return result;
 }
 
+bool Chain::operator<(const Chain& other) const {
+  if (longitud() != other.longitud()) {
+    return longitud() < other.longitud();
+  }
+  return cadena() < other.cadena();
+}
+
 std::ostream& operator<<(std::ostream& os, const Chain& chain) {
   if (chain.longitud() == 0) os << "&";
   else {
-    for (size_t i{0}; i < chain.longitud(); ++i) {
+    for (int i{0}; i < chain.longitud(); ++i) {
       os << chain.cadena()[i];
     }
   }
   return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const std::set<Chain> set) {
-  
+std::ostream& operator<<(std::ostream& os, const std::set<Chain>& set) {
+  os << "{";
+  for (auto it = set.begin(); it != set.end(); ++it) {
+    os << *it;                       
+    if (std::next(it) != set.end()) {
+      os << ", ";
+    }
+  }
+  os << "}";
+  return os;
 }

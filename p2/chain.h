@@ -20,7 +20,7 @@ class Chain {
   Chain() { }
   Chain(const std::vector<Symbol>& chain) : cadena_{chain} { }
 
-  std::vector<Symbol> cadena() const {
+  const std::vector<Symbol>& cadena() const {
     return cadena_;
   }
 
@@ -28,15 +28,17 @@ class Chain {
     return cadena().size();
   }
 
-  std::vector<Symbol> inversa();
+  Chain inversa() const;
   std::set<Chain> prefijos() const;
   std::set<Chain> sufijos() const;
+
+  bool operator<(const Chain& other) const;
 
  private:
   std::vector<Symbol> cadena_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Chain& chain);
-std::ostream& operator<<(std::ostream& os, const std::set<Chain>& cadenas);
+std::ostream& operator<<(std::ostream& os, const std::set<Chain>& set);
 
 #endif

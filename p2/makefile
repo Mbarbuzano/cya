@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -std=c++17
+CXXFLAGS = -Wall -std=c++23
 
 SRC = p02_strings_main.cc symbol.cc chain.cc alphabet.cc
 OBJ = $(SRC:.cc=.o)

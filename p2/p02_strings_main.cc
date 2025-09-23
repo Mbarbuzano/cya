@@ -81,8 +81,13 @@ int main(int argc, char* argv[]) {
         outfile << chain.inversa() << "\n";
       break;
 
-      
+      case 4:
+        outfile << chain.prefijos() << "\n";
+      break;
 
+      case 5:
+        outfile << chain.sufijos() << "\n";
+      break;
     }
 
     cadena.clear();
