@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
     Alphabet alphabet{simbolos};
 
     if (opcode > 5 || opcode < 1) {
-      std::cout << "Número inválido. Ingrese un número entre 1 y 5.\n";
+      std::cout << "Número inválido. Ingrese un número entre 1 y 6.\n";
       return 1;
     }
 

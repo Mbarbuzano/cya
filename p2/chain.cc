@@ -12,6 +12,8 @@
 
 #include "chain.h"
 
+// En el método inversa() se usa un vector para ingresar los símbolos 
+// recorriendo el vector desde el final al principio
 Chain Chain::inversa() const {
   std::vector<Symbol> result;
   for (auto it = cadena().rbegin(); it != cadena().rend(); ++it) {
@@ -20,6 +22,8 @@ Chain Chain::inversa() const {
   return Chain{result};
 }
 
+// Primero se inserta la cadena vacía y se usa std::set para evitar duplicados
+// Se va insertando en un vector temporal 
 std::set<Chain> Chain::prefijos() const {
   std::set<Chain> result;
   result.insert(Chain{});  
