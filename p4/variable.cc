@@ -16,7 +16,7 @@ std::ostream& operator<<(std::ostream& os, const Variable& var) {
   os << "[Line " << var.linea() << "] " << var.tipo() << ": "
      << var.nombre();
   if (var.inicializado()) {
-      os << " = " << var.valor();
+      os << " = " << var.valor() << "\n";
   }
   return os;
 }

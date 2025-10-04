@@ -13,6 +13,6 @@
 #include "loop.h"
 
 std::ostream& operator<<(std::ostream& os, const Loop& buc) {
-  os << "[Line " << buc.linea() << "] LOOP: " << buc.tipo();
+  os << "[Line " << buc.linea() << "] LOOP: " << buc.tipo() << "\n";
   return os;
 }
