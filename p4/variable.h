@@ -15,6 +15,7 @@
 
 #include <iostream>
 #include <regex>
+#include <fstream>
 
 class Variable {
  public:

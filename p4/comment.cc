@@ -14,12 +14,17 @@
 
 std::ostream& operator<<(std::ostream& os, const Comment& com) {
   if (com.linea_ini() == com.linea_fin())
-    os << "[Line " << com.linea_ini() << "] ";
-  else {
-    os << "[Line " << com.linea_ini() << "-" << com.linea_fin() << "] ";
-  }
-  if (com.tipo() == "description") os << "DESCRIPTION\n";
-  else {
+  os << "[Line " << com.linea_ini() << "] ";
 
+  else
+  os << "[Line " << com.linea_ini() << "-" << com.linea_fin() << "] ";
+
+  if (com.tipo() == "description") {
+  os << "DESCRIPTION:\n";
+  } 
+  else {
+    os << "COMMENT: " << com.contenido();
   }
+
+  return os;
 }

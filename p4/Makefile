@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++23
 
-SRC = 
+SRC = main.cc comment.cc loop.cc variable.cc
 OBJ = $(SRC:.cc=.o)
 EXEC = p04_code_analyzer
 
