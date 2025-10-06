@@ -19,6 +19,12 @@ void ModoDeEmpleo() {
 
 int main(int argc, char* argv[]) {
   if (argc == 1) ModoDeEmpleo();
+  std::string infile(argv[1]);
+  std::string outfile(argv[2]);
+
+  Analyser analizador;
+  analizador.AnalyseFile(infile);
+  analizador.ExportResults(infile, outfile);
 
   return 0;
 }

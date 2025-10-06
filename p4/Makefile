@@ -3,7 +3,7 @@ CXXFLAGS = -Wall -std=c++23
 
 SRC = main.cc comment.cc loop.cc variable.cc analyser.cc
 OBJ = $(SRC:.cc=.o)
-EXEC = p04_code_analyzer
+EXEC = p04_code_analyser
 
 $(EXEC): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJ)

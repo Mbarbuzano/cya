@@ -32,6 +32,9 @@ class Analyser {
   void DetectMain(const std::string& line, const int& line_number);
   void DetectComment(std::string& line, int& line_number, std::ifstream& file);
 
+  void AnalyseFile(const std::string& inputf_filename);
+  void ExportResults(const std::string& input_filename, const std::string& output_filename) const;
+
  private:
   std::vector<Variable> variables_;
   std::vector<Loop> bucles_;
