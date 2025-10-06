@@ -10,7 +10,8 @@
 // Archivo: main.cc
 // Contenido: fichero principal del programa con la función main
 
-#include "comment.h"
+#include "analyser.h"
+
 void ModoDeEmpleo() {
   std::cout << "Modo de uso: ./p04_code_analyzer [fichero de código].cc [fichero de salida].txt\n";
 }
