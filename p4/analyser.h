@@ -29,7 +29,7 @@ class Analyser {
 
   void DetectVariable(const std::string& line, const int& line_number);
   void DetectLoop(const std::string& line, const int& line_number);
-  void DetectMain(const std::string& line, const int& line_number);
+  void DetectMain(const std::string& line);
   void DetectComment(std::string& line, int& line_number, std::ifstream& file);
 
   void AnalyseFile(const std::string& inputf_filename);

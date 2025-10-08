@@ -13,85 +13,52 @@
 #include "analyser.h"
 
 void Analyser::DetectComment(std::string& line, int& lineNumber, std::ifstream& file) {
-  size_t single_pos = line.find("//");
-  size_t multi_pos = line.find("/*");
+  std::regex singleLine(R"(^\s*//(.*))");
+  std::regex multiStart(R"(^\s*/\*.*)");
+  std::regex multiEnd(R"(.*\*/\s*$)");
+  std::smatch match;
 
-  if (single_pos == std::string::npos && multi_pos == std::string::npos) return;
+  // --- comentario de línea ---
+  if (std::regex_search(line, match, singleLine)) {
+    std::string contenido = "//" + match[1].str();
+    int start_line = lineNumber, end_line = lineNumber;
 
-  // --- 1. Detección de comentario de línea (//) ---
-  if (single_pos != std::string::npos && (multi_pos == std::string::npos || single_pos < multi_pos)) {
-    std::string contenido = line.substr(single_pos);
-    int start_line = lineNumber;
-    int end_line = lineNumber;
-
-    // --- 1A. Si es el inicio del archivo y hay varias líneas // consecutivas ---
-    if (comentarios_.empty() && lineNumber <= 3) {
-      std::string bloque = contenido + "\n";
-
-      // Leer líneas siguientes mientras empiecen por //
-      std::streampos prev_pos = file.tellg();  // guarda posición actual
-      std::string next;
-      while (std::getline(file, next)) {
-        ++lineNumber;
-        if (next.find("//") == 0 || next.find(" //") == 0) {
-          bloque += next + "\n";
-          end_line = lineNumber;
-          prev_pos = file.tellg(); // actualizar
-        } else {
-          // Retrocede una línea (hemos leído una no comentario)
-          file.seekg(prev_pos);
-          --lineNumber;
-          break;
-        }
-      }
-
-      comentarios_.push_back(Comment("description", start_line, end_line, bloque));
-      return;
-    }
-
-    // --- 1B. Comentario simple normal ---
-    comentarios_.push_back(Comment("single", start_line, end_line, contenido));
+    // Si es el principio del archivo, puede ser descripción
+    std::string tipo = (comentarios_.empty() && lineNumber <= 3) ? "description" : "single";
+    comentarios_.push_back(Comment(tipo, start_line, end_line, contenido));
     return;
   }
 
-  // --- 2. Comentarios multilínea (/* ... */) ---
-  if (multi_pos != std::string::npos) {
-    std::string contenido = line.substr(multi_pos) + "\n";
+  // --- comentario multilínea ---
+  if (std::regex_search(line, match, multiStart)) {
+    std::string contenido = line + "\n";
     int start_line = lineNumber;
-
-    if (line.find("*/", multi_pos) != std::string::npos) {
-      int end_line = lineNumber;
-      std::string tipo = (comentarios_.empty()) ? "description" : "multi";
-      comentarios_.push_back(Comment(tipo, start_line, end_line, contenido));
+    // Si termina en la misma línea
+    if (std::regex_search(line, multiEnd)) {
+      comentarios_.push_back(Comment("multi", start_line, lineNumber, contenido));
       return;
     }
-
+    // Si no, sigue leyendo
     while (std::getline(file, line)) {
       ++lineNumber;
       contenido += line + "\n";
-      if (line.find("*/") != std::string::npos) {
-        int end_line = lineNumber;
-        std::string tipo = (comentarios_.empty()) ? "description" : "multi";
-        comentarios_.push_back(Comment(tipo, start_line, end_line, contenido));
-        return;
-      }
+      if (std::regex_search(line, multiEnd)) break;
     }
+    std::string tipo = (comentarios_.empty()) ? "description" : "multi";
+    comentarios_.push_back(Comment(tipo, start_line, lineNumber, contenido));
   }
 }
 
+
 void Analyser::DetectVariable(const std::string& line, const int& lineNumber) {
-  // 1. Filtro rápido
-  if (line.find("int") == std::string::npos && line.find("double") == std::string::npos)
-    return;
-
-  // 2. Evitar declaraciones dentro de bucles
-  if (line.find("for(") != std::string::npos || line.find("for (") != std::string::npos ||
-      line.find("while(") != std::string::npos || line.find("while (") != std::string::npos) {
-    return;
-  }
-
-  // 3. Expresión regular más tolerante (acepta indentación y variables locales)
-  std::regex varRegex(R"((?:^|\s)(int|double)\s+([a-zA-Z_]\w*)(?:\s*=\s*([^;]+))?;)");
+  // Expresión regular: declaraciones de int/double fuera de bucles
+  // Explicación:
+  // ^\s* → puede haber espacios al inicio
+  // (?!for|while) → no debe comenzar con "for" o "while"
+  // (int|double) → tipo de variable
+  // \s+([a-zA-Z_]\w*) → nombre
+  // (?:\s*=\s*([^;]+))?; → valor opcional seguido de ';'
+  std::regex varRegex(R"(^\s*(?!for|while)(int|double)\s+([a-zA-Z_]\w*)(?:\s*=\s*([^;]+))?;)");
   std::smatch match;
 
   if (std::regex_search(line, match, varRegex)) {
@@ -103,40 +70,29 @@ void Analyser::DetectVariable(const std::string& line, const int& lineNumber) {
   }
 }
 
-void Analyser::DetectLoop(const std::string& line, const int& lineNumber) {
-  // --- 1. Filtros para comentarios ---
-  // Si la línea contiene // o está dentro de /* ... */, la ignoramos
-  if (line.find("//") != std::string::npos || line.find("/*") != std::string::npos)
-    return;
 
-  // --- 2. Expresión regular robusta ---
-  // \b -> delimita palabra (evita detectar 'before' o 'format')
-  // \s*\( -> asegura que esté seguido de un paréntesis
-  std::regex loopRegex(R"(\b(for|while)\s*\()");
+void Analyser::DetectLoop(const std::string& line, const int& lineNumber) {
+  // Expresión regular: detecta "for(" o "while(" pero no si están dentro de comentarios
+  // ^\s*(?!//) → línea no empieza con comentario
+  // \b(for|while)\s*\( → palabra for o while seguida de "("
+  std::regex loopRegex(R"(^\s*(?!//)\b(for|while)\s*\()");
   std::smatch match;
 
-  // --- 3. Búsqueda ---
   if (std::regex_search(line, match, loopRegex)) {
-    std::string tipo = match[1].str();
-    bucles_.push_back(Loop(tipo, lineNumber));
+    bucles_.push_back(Loop(match[1].str(), lineNumber));
   }
 }
 
 
-void Analyser::DetectMain(const std::string& line, const int& lineNumber) {
-  // --- 1. Filtro rápido ---
-  // Si la línea no contiene "main", salimos
-  if (line.find("main") == std::string::npos) return;
 
-  // --- 2. Expresión regular ---
-  // Detecta la declaración típica de main:
-  // int main() o int main(int argc, char* argv[])
-
-  std::regex mainRegex(R"(\bint\s+main\s*\()");
+void Analyser::DetectMain(const std::string& line) {
+  // Busca "int main(" o "void main("
+  std::regex mainRegex(R"(\b(int|void)\s+main\s*\()");
   if (std::regex_search(line, mainRegex)) {
-    set_func_main(true); // atributo privado bool de la clase Analyser
+    set_func_main(true);
   }
 }
+
 
 void Analyser::AnalyseFile(const std::string& input_filename) {
   std::ifstream file(input_filename);
@@ -160,7 +116,7 @@ void Analyser::AnalyseFile(const std::string& input_filename) {
     DetectLoop(line, line_number);
 
     // 4. Detectar la existencia de main()
-    DetectMain(line, line_number);
+    DetectMain(line);
 
     // Avanzamos línea
     ++line_number;
