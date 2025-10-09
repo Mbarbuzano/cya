@@ -18,27 +18,22 @@ void Analyser::DetectComment(std::string& line, int& lineNumber, std::ifstream& 
   std::regex multiEnd(R"(.*\*/\s*$)");
   std::smatch match;
 
-  // --- comentario de línea ---
   if (std::regex_search(line, match, singleLine)) {
     std::string contenido = "//" + match[1].str();
     int start_line = lineNumber, end_line = lineNumber;
 
-    // Si es el principio del archivo, puede ser descripción
     std::string tipo = (comentarios_.empty() && lineNumber <= 3) ? "description" : "single";
     comentarios_.push_back(Comment(tipo, start_line, end_line, contenido));
     return;
   }
 
-  // --- comentario multilínea ---
   if (std::regex_search(line, match, multiStart)) {
     std::string contenido = line + "\n";
     int start_line = lineNumber;
-    // Si termina en la misma línea
     if (std::regex_search(line, multiEnd)) {
       comentarios_.push_back(Comment("multi", start_line, lineNumber, contenido));
       return;
     }
-    // Si no, sigue leyendo
     while (std::getline(file, line)) {
       ++lineNumber;
       contenido += line + "\n";
@@ -51,13 +46,6 @@ void Analyser::DetectComment(std::string& line, int& lineNumber, std::ifstream& 
 
 
 void Analyser::DetectVariable(const std::string& line, const int& lineNumber) {
-  // Expresión regular: declaraciones de int/double fuera de bucles
-  // Explicación:
-  // ^\s* → puede haber espacios al inicio
-  // (?!for|while) → no debe comenzar con "for" o "while"
-  // (int|double) → tipo de variable
-  // \s+([a-zA-Z_]\w*) → nombre
-  // (?:\s*=\s*([^;]+))?; → valor opcional seguido de ';'
   std::regex varRegex(R"(^\s*(?!for|while)(int|double)\s+([a-zA-Z_]\w*)(?:\s*=\s*([^;]+))?;)");
   std::smatch match;
 
@@ -72,9 +60,6 @@ void Analyser::DetectVariable(const std::string& line, const int& lineNumber) {
 
 
 void Analyser::DetectLoop(const std::string& line, const int& lineNumber) {
-  // Expresión regular: detecta "for(" o "while(" pero no si están dentro de comentarios
-  // ^\s*(?!//) → línea no empieza con comentario
-  // \b(for|while)\s*\( → palabra for o while seguida de "("
   std::regex loopRegex(R"(^\s*(?!//)\b(for|while)\s*\()");
   std::smatch match;
 
@@ -93,6 +78,20 @@ void Analyser::DetectMain(const std::string& line) {
   }
 }
 
+// MODIFICACIÓN
+
+void Analyser::DetectInclusion(std::string& line) {
+  std::regex include_pattern(R"(^\s*#include\s*([<"])([^">]+)([>"]))");
+
+  std::smatch match;
+  if (std::regex_search(line, match, include_pattern)) {
+    std::string name = match[2];
+    char delimiter = match[1].str()[0];
+    bool is_system = (delimiter == '<');
+    includes_.emplace_back(name, is_system);
+  }
+}
+
 
 void Analyser::AnalyseFile(const std::string& input_filename) {
   std::ifstream file(input_filename);
@@ -104,9 +103,8 @@ void Analyser::AnalyseFile(const std::string& input_filename) {
   std::string line;
   int line_number = 1;
 
-  // --- Bucle principal de lectura ---
   while (std::getline(file, line)) {
-    // 1. Detectar comentarios primero, porque pueden contener texto que coincida con otros patrones
+    // 1. Detectar comentarios
     DetectComment(line, line_number, file);
 
     // 2. Detectar variables (int y double)
@@ -118,7 +116,9 @@ void Analyser::AnalyseFile(const std::string& input_filename) {
     // 4. Detectar la existencia de main()
     DetectMain(line);
 
-    // Avanzamos línea
+    // 5. Detección de includes
+    DetectInclusion(line);
+
     ++line_number;
   }
 
@@ -172,12 +172,26 @@ void Analyser::ExportResults(const std::string& input_filename, const std::strin
   out << "COMMENTS:\n";
   bool any_comments = false;
   for (const auto& com : comentarios_) {
-    if (com.tipo() != "description") {
-      out << com;
+    if (com.tipo() != "description\n") {
+      out << com << "\n\n";
       any_comments = true;
     }
   }
   if (!any_comments) out << "(No comments)\n";
+
+  // MODIFICACIÓN
+
+  out << "INCLUDES:\n";
+  int std_count = 0;
+  int user_count = 0;
+
+  for (const auto& inc : includes_) {
+    if (inc.system()) ++std_count;
+    else ++user_count;
+  }
+
+  out << "STD: " << std_count << "\n";
+  out << "USER: " << user_count << "\n";
 
   out.close();
 }

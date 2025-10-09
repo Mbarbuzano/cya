@@ -13,7 +13,7 @@
 #ifndef ANALYSER_H_
 #define ANALYSER_H_
 
-#include "comment.h"
+#include "includer.h"
 
 class Analyser {
  public:
@@ -35,11 +35,16 @@ class Analyser {
   void AnalyseFile(const std::string& inputf_filename);
   void ExportResults(const std::string& input_filename, const std::string& output_filename) const;
 
+  // MODIFICACIÓN
+  void DetectInclusion(std::string& in);
+
+
  private:
   std::vector<Variable> variables_;
   std::vector<Loop> bucles_;
   std::vector<Comment> comentarios_;
   bool func_main_;
+  std::vector<Includer> includes_;
 };
 
 #endif
