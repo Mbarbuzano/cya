@@ -49,3 +49,70 @@ Automaton::Automaton(const std::string& input) {
       }
     }
 }
+
+std::set<int> Automaton::Move(const std::set<int>& estados, char simbolo) const {
+  std::set<int> resultado;
+
+  for (int estado : estados) {
+    auto it_estado = transiciones_.find(estado);
+    if (it_estado == transiciones_.end()) continue;  // sin transiciones
+
+    auto it_simbolo = it_estado->second.find(simbolo);
+    if (it_simbolo == it_estado->second.end()) continue;
+
+    // Insertar todos los destinos posibles
+    resultado.insert(it_simbolo->second.begin(), it_simbolo->second.end());
+  }
+
+  return resultado;
+}
+
+std::set<int> Automaton::EpsilonClosure(const std::set<int>& estados) const {
+  std::set<int> closure = estados;
+  std::queue<int> pendientes;
+
+  for (int e : estados) pendientes.push(e);
+
+  while (!pendientes.empty()) {
+    int estado = pendientes.front();
+    pendientes.pop();
+
+    auto it_estado = transiciones_.find(estado);
+    if (it_estado == transiciones_.end()) continue;
+
+    auto it_eps = it_estado->second.find('&');
+    if (it_eps == it_estado->second.end()) continue;
+
+    for (int destino : it_eps->second) {
+      if (closure.insert(destino).second) { // si se añadió nuevo
+        pendientes.push(destino);
+      }
+    }
+  }
+
+  return closure;
+}
+
+bool Automaton::Intersecta(const std::set<int>& a, const std::set<int>& b) const {
+  for (int x : a) {
+    if (b.count(x)) return true;
+  }
+  return false;
+}
+
+
+bool Automaton::ProcesarCadena(const std::string& cadena) const {
+  std::set<int> actuales = EpsilonClosure({inicial_});
+
+  for (char simbolo : cadena) {
+    if (!alfabeto_.count(simbolo)) {
+      // símbolo no reconocido → rechazo inmediato
+      return false;
+    }
+
+    std::set<int> siguientes = Move(actuales, simbolo);
+    actuales = EpsilonClosure(siguientes);
+  }
+
+  return Intersecta(actuales, finales_);
+}

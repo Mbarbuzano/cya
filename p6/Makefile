@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++23
 
-SRC = 
+SRC = automaton.cc main.cc
 OBJ = $(SRC:.cc=.o)
 EXEC = p06_automata_simulator
 

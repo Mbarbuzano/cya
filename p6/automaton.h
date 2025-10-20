@@ -17,14 +17,15 @@
 #include <fstream>
 #include <sstream>
 #include <stdexcept>
+#include <queue>
 #include <set>
 #include <map>
 
 class Automaton {
  public:
-  Automaton() {}
-  Automaton(const std::string& input);
-  
+  Automaton(const std::string& filename);
+  bool ProcesarCadena(const std::string& cadena) const;
+
   std::set<char> alfabeto() const { return alfabeto_; }
   int n_estados() const { return n_estados_; }
   int inicial() const { return inicial_; }
@@ -37,6 +38,11 @@ class Automaton {
   int inicial_;
   std::set<int> finales_;
   std::map<int, std::map<char, std::set<int>>> transiciones_;
+
+  std::set<int> Move(const std::set<int>& estados, char simbolo) const;
+  std::set<int> EpsilonClosure(const std::set<int>& estados) const;
+  bool Intersecta(const std::set<int>& a, const std::set<int>& b) const;
 };
+
 
 #endif
