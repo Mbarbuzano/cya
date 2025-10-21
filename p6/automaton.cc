@@ -19,7 +19,7 @@ Automaton::Automaton(const std::string& input) {
   }
 
   std::string linea;
-  if (std::getline(file, linea)) {
+  if (!std::getline(file, linea)) {
     throw std::runtime_error("El archivo está vacío");
   }
 

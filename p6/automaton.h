@@ -23,6 +23,7 @@
 
 class Automaton {
  public:
+  Automaton() {}
   Automaton(const std::string& filename);
   bool ProcesarCadena(const std::string& cadena) const;
 
