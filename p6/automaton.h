@@ -27,12 +27,6 @@ class Automaton {
   Automaton(const std::string& filename);
   bool ProcesarCadena(const std::string& cadena) const;
 
-  std::set<char> alfabeto() const { return alfabeto_; }
-  int n_estados() const { return n_estados_; }
-  int inicial() const { return inicial_; }
-  std::set<int> finales() { return finales_; }
-  std::map<int, std::map<char, std::set<int>>> transiciones() { return transiciones_; }
-
  private:
   std::set<char> alfabeto_;
   int n_estados_;
