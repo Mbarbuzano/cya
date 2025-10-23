@@ -7,8 +7,8 @@
 // Autor: Marcos Barbuzano Socorro
 // Correo: alu0101629469@ull.edu.es
 // Fecha: 23/10/2025
-// Archivo: automaton.h
-// Contenido: declaración de la clase autómata
+// Archivo: automaton.cc
+// Contenido: implementación de la clase autómata
 
 #include "automaton.h"
 
@@ -115,4 +115,51 @@ bool Automaton::ProcesarCadena(const std::string& cadena) const {
   }
   //comprueba que el último estado sea de aceptación
   return Comprobar(actuales, finales_);
+}
+
+//MODIFICACIÓN
+
+void Automaton::TrazarCadena(const std::string& cadena) const {
+  std::set<int> actuales = EpsilonClosure({inicial_});
+
+  std::cout << "\n--- TRAZA para cadena: " << cadena << " ---\n";
+
+  for (char simbolo : cadena) {
+    std::cout << "Estado(s) actual(es): { ";
+    for (int e : actuales) std::cout << e << " ";
+    std::cout << "}\n";
+
+    std::cout << "Símbolo leído: '" << simbolo << "'\n";
+    if (!alfabeto_.count(simbolo)) {
+      std::cout << "El símbolo no pertenece al alfabeto.\n";
+      return;
+    }
+
+    std::cout << "Transiciones aplicadas:\n";
+    std::set<int> siguientes = Move(actuales, simbolo);
+    for (int origen : actuales) {
+      auto it = transiciones_.find(origen);
+      if (it != transiciones_.end() && it->second.count(simbolo)) {
+        std::cout << "   " << origen << " --" << simbolo << "--> { ";
+        for (int destino : it->second.at(simbolo)) std::cout << destino << " ";
+        std::cout << "}\n";
+      }
+    }
+
+    actuales = EpsilonClosure(siguientes);
+
+    std::cout << "Estados siguientes (tras cierre ε): { ";
+    for (int e : actuales) std::cout << e << " ";
+    std::cout << "}\n";
+
+    std::cout << "Pulsa Enter para continuar...";
+    std::cin.get();
+    std::cout << "\n";
+  }
+
+  bool aceptada = Comprobar(actuales, finales_);
+  std::cout << "Resultado final: "
+            << (aceptada ? "Cadena ACEPTADA" : "Cadena RECHAZADA") << "\n";
+  std::cout << "Pulsa Enter para continuar con la siguiente cadena...";
+  std::cin.get();
 }

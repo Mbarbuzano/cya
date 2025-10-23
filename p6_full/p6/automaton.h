@@ -34,10 +34,10 @@ class Automaton {
   std::set<int> finales_;
   std::map<int, std::map<char, std::set<int>>> transiciones_;
 
+  // Métodos para el procesado de cadenas
   std::set<int> Move(const std::set<int>& estados, char simbolo) const;
   std::set<int> EpsilonClosure(const std::set<int>& estados) const;
   bool Comprobar(const std::set<int>& a, const std::set<int>& b) const;
 };
-
 
 #endif
