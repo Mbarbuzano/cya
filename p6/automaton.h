@@ -36,7 +36,7 @@ class Automaton {
 
   std::set<int> Move(const std::set<int>& estados, char simbolo) const;
   std::set<int> EpsilonClosure(const std::set<int>& estados) const;
-  bool Intersecta(const std::set<int>& a, const std::set<int>& b) const;
+  bool Comprobar(const std::set<int>& a, const std::set<int>& b) const;
 };
 
 

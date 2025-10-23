@@ -93,7 +93,7 @@ std::set<int> Automaton::EpsilonClosure(const std::set<int>& estados) const {
   return closure;
 }
 
-bool Automaton::Intersecta(const std::set<int>& a, const std::set<int>& b) const {
+bool Automaton::Comprobar(const std::set<int>& a, const std::set<int>& b) const {
   for (int x : a) {
     if (b.count(x)) return true;
   }
@@ -113,6 +113,6 @@ bool Automaton::ProcesarCadena(const std::string& cadena) const {
     std::set<int> siguientes = Move(actuales, simbolo);
     actuales = EpsilonClosure(siguientes);
   }
-
-  return Intersecta(actuales, finales_);
+  //comprueba que el último estado sea de aceptación
+  return Comprobar(actuales, finales_);
 }
