@@ -13,5 +13,10 @@
 #include "grammar.h"
 
 int main(int argc, char* argv[]) {
+  if (argc == 1) {
+    std::cout << "Modo de empleo: ./Grammar2CNF input.gra output.gra\n"
+              <<  "Pruebe Grammar2CNF --help para mas informacion.\n";
+  }
+
   
 }
