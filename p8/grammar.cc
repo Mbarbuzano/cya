@@ -67,5 +67,39 @@ Grammar::Grammar(const std::string& input) {
 
     producciones_.push_back(prod);
   }
+}
 
+void Grammar::WriteToFile(const std::string& fileout) const {
+  // Abrir el archivo de salida
+  std::ofstream salida{fileout};
+  if (!salida.is_open()) {
+    throw std::runtime_error("No se pudo abrir el archivo de salida: " + fileout);
+  }
+
+  // --- Escribir terminales ---
+  salida << terminales_.size() << "\n";
+  for (const auto& t : terminales_) {
+    salida << t << "\n";
+  }
+
+  // --- Escribir no terminales ---
+  salida << no_terminales_.size() << "\n";
+  for (const auto& nt : no_terminales_) {
+    salida << nt << "\n";
+  }
+
+  // --- Escribir producciones ---
+  salida << producciones_.size() << "\n";
+  for (const auto& prod : producciones_) {
+    salida << prod.left << " ";
+
+    // La parte derecha se concatena sin espacios, igual que en los .gra
+    for (const auto& symbol : prod.right) {
+      salida << symbol;
+    }
+
+    salida << "\n";
+  }
+
+  salida.close();  // cerrar el archivo explícitamente
 }

@@ -26,6 +26,8 @@ class Grammar {
  public:
   Grammar() { }
   Grammar(const std::string& input);
+
+  void WriteToFile(const std::string& fileout) const;
   
  private:
   std::vector<std::string> terminales_;
