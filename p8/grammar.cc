@@ -209,3 +209,57 @@ void Grammar::RemoveEmptyProductions() {
     producciones_.push_back(p);
   }
 }
+
+void Grammar::RemoveUnitProductions() {
+  std::map<std::string, std::set<std::string>> unitarias;
+  for (const auto& nt : no_terminales_) {
+    unitarias[nt].insert(nt);
+  }
+
+  // Construir la clausura de producciones unitarias
+  bool cambio = true;
+  while (cambio) {
+    cambio = false;
+    for (const auto& prod : producciones_) {
+      if (prod.right.size() == 1 && 
+          std::find(no_terminales_.begin(), no_terminales_.end(), prod.right[0]) != no_terminales_.end()) {
+        std::string A = prod.left;
+        std::string B = prod.right[0];
+        size_t antes = unitarias[A].size();
+        unitarias[A].insert(unitarias[B].begin(), unitarias[B].end());
+        if (unitarias[A].size() > antes) cambio = true;
+      }
+    }
+  }
+
+  // Generar nuevas producciones sin las unitarias
+  std::vector<Production> nuevas;
+  for (const auto& prod : producciones_) {
+    if (prod.right.size() == 1 && 
+        std::find(no_terminales_.begin(), no_terminales_.end(), prod.right[0]) != no_terminales_.end()) {
+      continue; // saltar unitarias
+    }
+  }
+
+  for (const auto& [A, clausura] : unitarias) {
+    for (const auto& B : clausura) {
+      for (const auto& prod : producciones_) {
+        if (prod.left == B && 
+            !(prod.right.size() == 1 && std::find(no_terminales_.begin(), no_terminales_.end(), prod.right[0]) != no_terminales_.end())) {
+          Production nueva = prod;
+          nueva.left = A;
+          nuevas.push_back(nueva);
+        }
+      }
+    }
+  }
+
+  producciones_ = nuevas;
+}
+
+void Grammar::Chomsky() {
+  RemoveEmptyProductions();
+  RemoveUnitProductions();
+  ReplaceTerminalsInRules();
+  BreakLongProductions();
+}

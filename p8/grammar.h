@@ -16,7 +16,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <stdexcept>
+#include <algorithm>
 #include <set>
 #include <map>
 
@@ -35,6 +35,10 @@ class Grammar {
   void ReplaceTerminalsInRules();
   void BreakLongProductions();
   void RemoveEmptyProductions();
+  void RemoveUnitProductions();
+
+  void Chomsky();
+
   
  private:
   std::vector<std::string> terminales_;
