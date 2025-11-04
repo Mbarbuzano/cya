@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
   std::string entrada{argv[1]};
   std::string salida{argv[2]};
   Grammar gramatica{entrada};
-
+  
   gramatica.WriteToFile(salida);
   return 0;
 }

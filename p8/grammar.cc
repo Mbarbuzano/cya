@@ -103,3 +103,109 @@ void Grammar::WriteToFile(const std::string& fileout) const {
 
   salida.close();  // cerrar el archivo explícitamente
 }
+
+void Grammar::ReplaceTerminalsInRules() {
+  std::map<std::string, std::string> terminal_to_variable;
+
+  // Crear variables nuevas para cada terminal (Ca, Cb, ...)
+  for (const auto& terminal : terminales_) {
+    std::string new_var = "C" + terminal;
+    terminal_to_variable[terminal] = new_var;
+    no_terminales_.push_back(new_var);
+
+    Production prod;
+    prod.left = new_var;
+    prod.right.push_back(terminal);
+    producciones_.push_back(prod);
+  }
+
+  // Reemplazar terminales dentro de producciones largas
+  for (auto& prod : producciones_) {
+    if (prod.right.size() >= 2) {
+      for (auto& symbol : prod.right) {
+        if (std::find(terminales_.begin(), terminales_.end(), symbol) != terminales_.end()) {
+          symbol = terminal_to_variable[symbol];
+        }
+      }
+    }
+  }
+}
+
+void Grammar::BreakLongProductions() {
+  std::vector<Production> nuevas_producciones;
+
+  for (auto& prod : producciones_) {
+    if (prod.right.size() <= 2) {
+      nuevas_producciones.push_back(prod);
+      continue;
+    }
+
+    // Necesitamos crear nuevos no terminales intermedios
+    std::string left = prod.left;
+    for (size_t i = 0; i < prod.right.size() - 2; ++i) {
+      std::string new_var = "D" + std::to_string(no_terminales_.size());
+      no_terminales_.push_back(new_var);
+
+      Production nueva;
+      nueva.left = left;
+      nueva.right = { prod.right[i], new_var };
+      nuevas_producciones.push_back(nueva);
+
+      left = new_var; // el siguiente eslabón usa este nuevo no terminal
+    }
+
+    // Última regla binaria
+    Production ultima;
+    ultima.left = left;
+    ultima.right = { prod.right[prod.right.size() - 2], prod.right.back() };
+    nuevas_producciones.push_back(ultima);
+  }
+
+  producciones_ = nuevas_producciones;
+}
+
+void Grammar::RemoveEmptyProductions() {
+  std::set<std::string> anulables;
+
+  // Buscar símbolos que producen ε directamente
+  for (const auto& prod : producciones_) {
+    if (prod.right.size() == 1 && prod.right[0] == "&") {
+      anulables.insert(prod.left);
+    }
+  }
+
+  std::vector<Production> nuevas;
+  for (const auto& prod : producciones_) {
+    if (prod.right.size() == 1 && prod.right[0] == "&") continue;
+
+    // Generar variantes eliminando símbolos anulables
+    size_t n = prod.right.size();
+    std::vector<int> indices;
+    for (size_t i = 0; i < n; ++i) {
+      if (anulables.count(prod.right[i])) indices.push_back(i);
+    }
+
+    // Añadir combinaciones con símbolos anulados
+    for (int mask = 0; mask < (1 << indices.size()); ++mask) {
+      Production variante = prod;
+      for (size_t j = 0; j < indices.size(); ++j) {
+        if (mask & (1 << j)) variante.right[indices[j]] = "";
+      }
+      std::vector<std::string> right_no_vacios;
+      for (auto& s : variante.right) if (!s.empty()) right_no_vacios.push_back(s);
+      if (!right_no_vacios.empty()) {
+        variante.right = right_no_vacios;
+        nuevas.push_back(variante);
+      }
+    }
+  }
+
+  // Reemplazar y restaurar S → & si procede
+  producciones_ = nuevas;
+  if (anulables.count(simbolo_inicial_)) {
+    Production p;
+    p.left = simbolo_inicial_;
+    p.right = { "&" };
+    producciones_.push_back(p);
+  }
+}

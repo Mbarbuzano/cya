@@ -16,6 +16,9 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <stdexcept>
+#include <set>
+#include <map>
 
 struct Production {
   std::string left;
@@ -28,6 +31,10 @@ class Grammar {
   Grammar(const std::string& input);
 
   void WriteToFile(const std::string& fileout) const;
+
+  void ReplaceTerminalsInRules();
+  void BreakLongProductions();
+  void RemoveEmptyProductions();
   
  private:
   std::vector<std::string> terminales_;
