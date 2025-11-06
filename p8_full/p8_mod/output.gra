@@ -1,0 +1,33 @@
+3
+a
+b
+c
+10
+S
+X
+Y
+Ca
+Cb
+Cc
+D6
+D7
+D8
+D9
+17
+S aD6
+D6 XD7
+D7 bX
+S aD8
+D8 bX
+S aD9
+D9 Xb
+S ab
+X aY
+X bY
+X a
+X b
+Y aY
+Y bY
+Y a
+Y b
+Y c
