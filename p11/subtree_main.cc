@@ -10,11 +10,17 @@
 // Archivo: point_cloud_main.cc
 // Contenido: archivo principal de compilación del proyecto
 
-#include "point_cloud.h"
+#include "subtree.h"
 
 int main(int argc, char* argv[]) {
   if (argc != 3) {
     ModoDeEmpleo();
+    return 1;
+  }
+
+  if (std::string(argv[1]) == "--help") {
+    Ayuda();
+    return 1;
   }
 
   return 0;

@@ -1,9 +1,9 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++23
 
-SRC = 
+SRC = subtree.cc point_types.cc subtree_main.cc
 OBJ = $(SRC:.cc=.o)
-EXEC = 
+EXEC = p11_emst
 
 $(EXEC): $(OBJ)
 	$(CXX) $(CXXFLAGS) -o $@ $(OBJ)
